@@ -1,4 +1,4 @@
-// Type definitions for react-router v2.0.0-rc5
+// Type definitions for react-router v2.0.0
 // Project: https://github.com/rackt/react-router
 // Definitions by: Sergey Buturlakin <http://github.com/sergey-buturlakin>, Yuichi Murata <https://github.com/mrk21>, Václav Ostrožlík <https://github.com/vasek17>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
@@ -18,7 +18,7 @@ declare namespace ReactRouter {
 
     type Component = React.ReactType
 
-    type EnterHook = (nextState: RouterState, replaceState: RedirectFunction, callback?: Function) => any
+    type EnterHook = (nextState: RouterState, replace: RedirectFunction, callback?: Function) => any
 
     type LeaveHook = () => any
 
@@ -26,7 +26,7 @@ declare namespace ReactRouter {
 
     type ParseQueryString = (queryString: H.QueryString) => H.Query
 
-    type RedirectFunction = (state: H.LocationState, pathname: H.Pathname | H.Path, query?: H.Query) => void
+    type RedirectFunction = (location: H.Location | string) => void
 
     type RouteComponent = Component
 
@@ -81,12 +81,14 @@ declare namespace ReactRouter {
     /* components */
 
     interface RouterProps extends React.Props<Router> {
-        history?: H.History
+        history: H.History
         routes?: RouteConfig // alias for children
         createElement?: (component: RouteComponent, props: Object) => any
         onError?: (error: any) => any
         onUpdate?: () => any
+        /** @deprecated parseQueryString is deprecated. Please create a custom history. http://tiny.cc/router-customquerystring' */
         parseQueryString?: ParseQueryString
+        /** @deprecated stringifyQuery is deprecated. Please create a custom history. http://tiny.cc/router-customquerystring' */
         stringifyQuery?: StringifyQuery
     }
     interface Router extends React.ComponentClass<RouterProps> {}
@@ -217,9 +219,9 @@ declare namespace ReactRouter {
 
     interface HistoryRoutes {
         listen(listener: RouterListener): Function
-        listenBeforeLeavingRoute(route: PlainRoute, hook: RouteHook): void
-        match(location: H.Location, callback: (error: any, nextState: RouterState, nextLocation: H.Location) => void): void
-        isActive(pathname: H.Pathname, query?: H.Query, indexOnly?: boolean): boolean
+        listenBeforeLeavingRoute(route: PlainRoute, hook: RouteHook): Function
+        match(location: H.Location, callback: (error: any, nextLocation: H.Location, nextState?: RouterState) => void): void
+        isActive(location: H.Location, indexOnly?: boolean): boolean
     }
 
     function useRoutes<T>(createHistory: HistoryModule.CreateHistory<T>): HistoryModule.CreateHistory<T & HistoryRoutes>
@@ -468,7 +470,5 @@ declare module "react-router" {
         PropTypes,
         match
     }
-
-    export default Router
 
 }

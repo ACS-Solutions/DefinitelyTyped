@@ -1,4 +1,4 @@
-// Type definitions for history v1.13.1
+// Type definitions for history v2.0.0
 // Project: https://github.com/rackt/history
 // Definitions by: Sergey Buturlakin <http://github.com/sergey-buturlakin>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
@@ -10,8 +10,6 @@ declare namespace HistoryModule {
 
     type Action = string
 
-    type BeforeUnloadHook = () => string | boolean
-
     type CreateHistory<T> = (options?: HistoryOptions) => T
 
     type CreateHistoryEnhancer<T, E> = (createHistory: CreateHistory<T>) => CreateHistory<T & E>
@@ -20,17 +18,15 @@ declare namespace HistoryModule {
         listenBefore(hook: TransitionHook): Function
         listen(listener: LocationListener): Function
         transitionTo(location: Location): void
-        pushState(state: LocationState, path: Path): void
-        replaceState(state: LocationState, path: Path): void
-        push(path: Path): void
-        replace(path: Path): void
+        push(location: Location | Pathname | Path): void
+        replace(location: Location | Pathname | Path): void
         go(n: number): void
         goBack(): void
         goForward(): void
         createKey(): LocationKey
-        createPath(path: Path): Path
-        createHref(path: Path): Href
-        createLocation(path?: Path, state?: LocationState, action?: Action, key?: LocationKey): Location
+        createPath(location: Location | Pathname | Path): Path
+        createHref(location: Location | Pathname | Path): Href
+        createLocation(location: Location | Pathname | Path, action?: Action, key?: LocationKey): Location
 
         /** @deprecated use location.key to save state instead */
         setState(state: LocationState): void
@@ -38,13 +34,17 @@ declare namespace HistoryModule {
         registerTransitionHook(hook: TransitionHook): void
         /** @deprecated use the callback returned from listenBefore instead */
         unregisterTransitionHook(hook: TransitionHook): void
+        /** @deprecated use push instead */
+        pushState(state: LocationState, path: Path): void
+        /** @deprecated use replace instead */
+        replaceState(state: LocationState, path: Path): void
     }
 
     type HistoryOptions = Object
 
     type Href = string
 
-    type Location = {
+    interface Location {
         pathname: Pathname
         search: QueryString
         query: Query
@@ -70,14 +70,20 @@ declare namespace HistoryModule {
     type TransitionHook = (location: Location, callback: Function) => any
 
 
+    type BeforeUnloadHook = () => string | boolean
+
     interface HistoryBeforeUnload {
         listenBeforeUnload(hook: BeforeUnloadHook): Function
     }
 
     interface HistoryQueries {
+        /** @deprecated use push instead */
         pushState(state: LocationState, pathname: Pathname | Path, query?: Query): void
+        /** @deprecated use replace instead */
         replaceState(state: LocationState, pathname: Pathname | Path, query?: Query): void
+        /** @deprecated the query argument to createPath is deprecated; use a location descriptor instead */
         createPath(path: Path, query?: Query): Path
+        /** @depercated the query argument to createHref is deprecated; use a location descriptor instead */
         createHref(path: Path, query?: Query): Href
     }
 
@@ -89,6 +95,7 @@ declare namespace HistoryModule {
         createHistory: CreateHistory<History>
         createHashHistory: CreateHistory<History>
         createMemoryHistory: CreateHistory<History>
+        /** @deprecated Using createLocation without a history instance is deprecated; please use history.createLocation instead */
         createLocation(path?: Path, state?: LocationState, action?: Action, key?: LocationKey): Location
         useBasename<T>(createHistory: CreateHistory<T>): CreateHistory<T>
         useBeforeUnload<T>(createHistory: CreateHistory<T>): CreateHistory<T & HistoryBeforeUnload>
@@ -126,6 +133,7 @@ declare module "history/lib/createMemoryHistory" {
 
 declare module "history/lib/createLocation" {
 
+    /** @deprecated Using createLocation without a history instance is deprecated; please use history.createLocation instead */
     export default function createLocation(path?: HistoryModule.Path, state?: HistoryModule.LocationState, action?: HistoryModule.Action, key?: HistoryModule.LocationKey): HistoryModule.Location
 
 }
